@@ -280,28 +280,20 @@ The notebook selected the threshold using `y_test` and then evaluated the model 
 ## 12. Repository Structure
 
 ```text
-clinical-trial-dropout-prediction/
+Clinical-Trial-Patient-Treatment-Discontinuation-Prediction/
 │
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── .gitignore
+├── IMAGES/
+│   ├── target_distribution.png
+│   ├── missing_values.png
+│   ├── correlation_heatmap.png
+│   ├── feature_boxplots_by_target.png
+│   ├── model_performance_comparison.png
+│   ├── confusion_matrix_logistic_0448.png
+│   └── logistic_regression_coefficients.png
 │
-├── data/
-│   └── raw/
-│       └── ACTG175_clinical_trial.csv
-│
-├── notebooks/
-│   └── clinical_trial_dropout_analysis.ipynb
-│
-└── IMAGES/
-    ├── target_distribution.png
-    ├── missing_values.png
-    ├── correlation_heatmap.png
-    ├── feature_boxplots_by_target.png
-    ├── model_performance_comparison.png
-    ├── confusion_matrix_logistic_0448.png
-    └── logistic_regression_coefficients.png
+├── ACTG175_clinical_trial.csv
+├── Clinical_Trail.ipynb
+└── README.md
 ```
 
 ## 13. Installation and Execution
