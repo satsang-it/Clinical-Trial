@@ -1,3 +1,4 @@
+
 # Clinical Trial Patient Dropout Prediction
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
@@ -5,263 +6,393 @@
 ![ML](https://img.shields.io/badge/Task-Binary%20Classification-orange)
 ![Status](https://img.shields.io/badge/Status-Research%20Project-lightgrey)
 
-I developed this machine-learning project to study off-treatment status in an AIDS clinical-trial dataset using the available demographic and clinical variables. I compare Logistic Regression, Random Forest, and Gradient Boosting, with an emphasis on class-sensitive evaluation and model interpretability.
+I developed this machine-learning project to study off-treatment status in an AIDS clinical-trial dataset using available demographic and clinical variables. I compared Logistic Regression, Random Forest, and Gradient Boosting, with an emphasis on class-sensitive evaluation and model interpretability.
 
-> **Research/educational project only.** This model is not clinically validated and must not be used to make treatment decisions or to manage real patients.
+> **Research/Educational Project Only:** This model is not clinically validated and must not be used to make treatment decisions or manage real patients.
 
-## 1. Project overview
+---
 
-I chose this problem because clinical-trial participant retention is important to the completeness and interpretability of trial results. In this project, I explore whether the available baseline participant characteristics can help identify participants who are recorded as off treatment (`offtrt = 1`).
+## 1. Project Overview
 
-I carried out exploratory data analysis, statistical association tests, feature engineering, model training, evaluation, threshold analysis, and coefficient interpretation in the Jupyter Notebook.
+Clinical-trial participant retention is important for the completeness and interpretability of trial results.
 
-## 2. Problem statement and objective
+In this project, I explored whether baseline participant characteristics could help identify participants recorded as off treatment (`offtrt = 1`).
 
-**Problem I addressed:** I built a binary classification workflow to estimate the probability of the `offtrt` outcome from the available predictor variables.
+The workflow includes:
+- Exploratory Data Analysis (EDA)
+- Statistical association tests
+- Feature engineering
+- Data preprocessing
+- Machine learning model development
+- Model comparison and evaluation
+- Decision-threshold optimization
+- Model interpretation
 
-**Target variable:** `offtrt`
-- `0`: not off treatment
-- `1`: off treatment
+## 2. Problem Statement and Objective
 
-The project summary in my notebook describes the outcome as discontinuation of assigned treatment before approximately 96 weeks. The uploaded files do not include a separate authoritative data dictionary, so this endpoint definition and the precise operational meaning of each field should be checked against the original dataset documentation before external publication or clinical interpretation.
+**Problem:** Build a binary classification workflow to estimate the probability of the `offtrt` outcome using available predictor variables.
 
-**What I aimed to do**
-- Explore the structure and distribution of the trial dataset.
+**Target Variable:** `offtrt`
+
+- `0`: Not off treatment
+- `1`: Off treatment
+
+The project summary in my notebook describes the outcome as discontinuation of assigned treatment before approximately 96 weeks. The precise operational definition should be checked against the original dataset documentation.
+
+### Project Objectives
+
+- Explore the structure and distribution of the dataset.
 - Examine numerical and categorical associations with the target.
 - Engineer a CD4-to-CD8 baseline ratio.
 - Compare three classification algorithms.
-- Examine class imbalance and the precision-recall trade-off.
-- Interpret Logistic Regression coefficients and document the limitations of my approach.
+- Address class imbalance.
+- Examine precision-recall trade-offs.
+- Interpret Logistic Regression coefficients.
+- Document model limitations.
 
-## 3. Dataset
+## 3. Dataset Description
 
-| Item | Value |
+| Attribute | Value |
 |---|---:|
-| Rows | 2,139 |
-| Original columns | 24 |
-| Missing cells | 0 |
-| Duplicate rows | 0 |
-| Target | `offtrt` |
+| Total Observations | 2,139 |
+| Original Features | 24 |
+| Missing Values | 0 |
+| Duplicate Records | 0 |
+| Target Variable | `offtrt` |
 | Class 0 | 1,363 (63.7%) |
 | Class 1 | 776 (36.3%) |
 
-The supplied CSV is included at `data/raw/ACTG175_clinical_trial.csv`.
+**Dataset File:** `data/raw/ACTG175_clinical_trial.csv`
 
-### Columns in the supplied file
+### Target Distribution
+
+<p align="center">
+  <img src="IMAGES/target_distribution.png" width="400" alt="Target Distribution">
+</p>
+
+### Data Quality Analysis
+
+The supplied dataset contains no missing values and no exact duplicate rows.
+
+<p align="center">
+  <img src="IMAGES/missing_values.png" width="400" alt="Missing Values Analysis">
+</p>
+
+### Dataset Features
 
 `time`, `trt`, `age`, `wtkg`, `hemo`, `homo`, `drugs`, `karnof`, `oprior`, `z30`, `zprior`, `preanti`, `race`, `gender`, `str2`, `strat`, `symptom`, `treat`, `offtrt`, `cd40`, `cd420`, `cd80`, `cd820`, `label`.
 
-In my analysis, I treated `trt` and `strat` as multi-level categorical variables and several 0/1 fields as categorical indicators. I examined `age`, `wtkg`, `karnof`, `preanti`, `cd40`, and `cd80` as numeric variables. A complete field-by-field data dictionary and the original download URL were **not** included in the uploaded files; do not infer clinical definitions from variable names alone.
+## 4. Exploratory Data Analysis
 
-### Target distribution
+The exploratory analysis included:
 
-![Target distribution](IMAGES/target_distribution.png)
+- Target variable distribution
+- Numerical feature distributions
+- Categorical feature distributions
+- Correlation analysis
+- Outlier detection using the IQR method
+- Feature relationships with the target variable
 
-### Data quality
+### Correlation Analysis
 
-The uploaded CSV has no missing values and no exact duplicate rows.
+<p align="center">
+  <img src="IMAGES/correlation_heatmap.png" width="550" alt="Correlation Heatmap">
+</p>
 
-![Missing values](IMAGES/missing_values.png)
+### Numerical Feature Analysis
 
-## 4. Workflow and methodology
+<p align="center">
+  <img src="IMAGES/feature_boxplots_by_target.png" width="550" alt="Feature Boxplots by Target">
+</p>
 
-1. Load and inspect the CSV.
-2. Convert selected indicator and treatment fields to categorical dtype.
-3. Remove `zprior`, which is constant in this file.
-4. Inspect potential outliers with the IQR rule; the notebook retains them.
-5. Exclude `time`, `cd420`, `cd820`, and `label` from the predictors. I treated these as follow-up/outcome-related fields rather than baseline predictors.
-6. Explore target balance, numeric feature distributions, and correlations.
-7. Run independent-samples t-tests for selected numeric features and chi-square tests for selected categorical features.
-8. Create `cd4_cd8_ratio = cd40 / cd80`.
-9. One-hot encode `trt` and `strat`.
-10. Inspect multicollinearity using VIF.
-11. Split the data into training and test sets (80:20), stratified by target, with `random_state=42`.
-12. Standardize selected continuous variables.
-13. Train and compare Logistic Regression, Random Forest, and tuned Gradient Boosting.
-14. Evaluate accuracy, precision, recall, F1, ROC-AUC, and confusion matrices.
-15. Examine threshold trade-offs, train-test gaps, and Logistic Regression coefficients.
+## 5. Statistical Analysis
 
-### Statistical analysis
+I performed statistical hypothesis testing to investigate associations between predictor variables and the target variable.
 
-I used t-tests for selected numeric features and chi-square tests for categorical features. These are exploratory univariate association checks; they do not establish causation. The tests use a nominal 0.05 significance threshold and do not apply a multiple-testing correction.
+| Test | Application |
+|---|---|
+| Independent Samples t-test | Numerical features |
+| Chi-square Test | Categorical features |
 
-### Feature engineering and preprocessing
+The tests used a nominal significance level of 0.05.
 
-- Engineered feature: `cd4_cd8_ratio`.
-- One-hot encoding: `trt` and `strat`, using `drop_first=True`.
-- Scaling: `age`, `wtkg`, `karnof`, `preanti`, `cd40`, `cd80`, and `cd4_cd8_ratio`.
-- Binary indicators and one-hot columns are passed through without standardization.
-- Outliers detected by the IQR rule were retained in the notebook.
+These analyses were exploratory and do not establish causal relationships. No multiple-testing correction was applied.
 
-## 5. Models and notebook-reported results
+## 6. Data Preprocessing and Feature Engineering
 
-The following values are taken from the executed outputs of my notebook. They are **not presented as an unbiased final benchmark**, because the threshold selection procedure uses the test labels (see the validation caveat below).
+The following preprocessing steps were implemented:
 
-| Model / decision threshold | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---:|---:|---:|---:|---:|
-| Logistic Regression / 0.500 | 0.596 | 0.452 | 0.548 | 0.496 | 0.616 |
-| Random Forest / 0.500 | 0.600 | 0.441 | 0.387 | 0.412 | 0.621 |
-| Gradient Boosting / 0.500 | 0.621 | 0.462 | 0.277 | 0.347 | 0.593 |
-| Logistic Regression / 0.448 | 0.558 | 0.436 | 0.748 | 0.551 | 0.616 |
+1. Converted selected indicator and treatment variables into categorical data types.
+2. Removed `zprior` because it was constant.
+3. Examined potential outliers using the IQR method.
+4. Excluded `time`, `cd420`, `cd820`, and `label` from predictors.
+5. Performed exploratory data analysis.
+6. Created a new feature: `cd4_cd8_ratio`.
+7. Applied One-Hot Encoding to `trt` and `strat`.
+8. Standardized selected continuous variables.
+9. Used stratified train-test splitting.
 
-![Model performance comparison](IMAGES/model_performance_comparison.png)
+### Engineered Feature
 
-### Selected model in the notebook
+**CD4/CD8 Ratio**
 
-I selected **class-weighted Logistic Regression** with a decision threshold of **0.448**, prioritising recall and F1 for the positive class over accuracy.
+\[
+CD4/CD8\ Ratio = \frac{CD40}{CD80}
+\]
 
-Its recorded confusion matrix is:
+### Preprocessing Techniques
 
-![Confusion matrix](IMAGES/confusion_matrix_logistic_0448.png)
+| Technique | Variables |
+|---|---|
+| One-Hot Encoding | `trt`, `strat` |
+| Standardization | `age`, `wtkg`, `karnof`, `preanti`, `cd40`, `cd80`, `cd4_cd8_ratio` |
+| Train-Test Split | 80:20 |
+| Stratification | Target variable |
+| Random State | 42 |
+
+## 7. Machine Learning Models
+
+I trained and evaluated three machine learning classification algorithms.
+
+### Models Implemented
+
+1. Logistic Regression
+2. Random Forest Classifier
+3. Gradient Boosting Classifier
+
+### Model Evaluation Metrics
+
+- Accuracy
+- Precision
+- Recall
+- F1-Score
+- ROC-AUC
+- Confusion Matrix
+
+### Model Performance Comparison
+
+The following results are transcribed from the executed notebook outputs.
+
+| Model | Threshold | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.500 | 0.596 | 0.452 | 0.548 | 0.496 | 0.616 |
+| Random Forest | 0.500 | 0.600 | 0.441 | 0.387 | 0.412 | 0.621 |
+| Gradient Boosting | 0.500 | 0.621 | 0.462 | 0.277 | 0.347 | 0.593 |
+| **Balanced Logistic Regression** | **0.448** | **0.558** | **0.436** | **0.748** | **0.551** | **0.616** |
+
+### Model Performance Visualization
+
+<p align="center">
+  <img src="IMAGES/model_performance_comparison.png" width="550" alt="Model Performance Comparison">
+</p>
+
+## 8. Final Model Selection
+
+I selected **Class-Weighted Logistic Regression with a decision threshold of 0.448**.
+
+The selection prioritised identifying a larger proportion of positive cases and improving the F1-score rather than maximising overall accuracy.
+
+### Final Model Performance
+
+| Metric | Score |
+|---|---:|
+| Accuracy | 0.558 |
+| Precision | 0.436 |
+| Recall | 0.748 |
+| F1-Score | 0.551 |
+| ROC-AUC | 0.616 |
+| Decision Threshold | 0.448 |
+
+### Confusion Matrix
+
+<p align="center">
+  <img src="IMAGES/confusion_matrix_logistic_0448.png" width="380" alt="Logistic Regression Confusion Matrix">
+</p>
 
 | | Predicted 0 | Predicted 1 |
 |---|---:|---:|
 | Actual 0 | 123 | 150 |
 | Actual 1 | 39 | 116 |
 
-At this threshold, the notebook reports recall of 0.748 for class 1 and precision of 0.436. In practical classification terms, the model identifies a larger share of positive cases but also produces many false-positive alerts.
+The model achieved a recall of 0.748, indicating that it identified approximately 74.8% of positive cases in the recorded test split.
 
-### Cross-validation and overfitting outputs
+However, the relatively low precision of 0.436 indicates a substantial number of false-positive predictions.
 
-- Unbalanced Logistic Regression: 5-fold training CV ROC-AUC mean = 0.624, standard deviation = 0.035.
-- Balanced Logistic Regression (threshold 0.448): train/test ROC-AUC = 0.651 / 0.616; train/test F1 = 0.554 / 0.551.
-- Random Forest: train/test ROC-AUC = 1.000 / 0.621; train/test F1 = 1.000 / 0.412.
-- Gradient Boosting: train/test ROC-AUC = 0.966 / 0.593; train/test F1 = 0.822 / 0.347.
+### Logistic Regression Coefficient Analysis
 
-The tree models show large train-test gaps in the notebook, consistent with substantial overfitting on this split.
+<p align="center">
+  <img src="IMAGES/logistic_regression_coefficients.png" width="550" alt="Logistic Regression Coefficients">
+</p>
 
-## 6. Exploratory visualizations and findings
+The largest positive coefficients included `drugs`, `symptom`, and `preanti`.
 
-### Numeric features by target
+Larger negative coefficients included `strat_3`, `str2`, `cd40`, and `karnof`.
 
-![Numeric feature boxplots](IMAGES/correlation_heatmap.png)
+These coefficients represent conditional associations within the fitted model and should not be interpreted as causal effects.
 
-### Correlation
+## 9. Cross-Validation and Overfitting Analysis
 
-![Correlation heatmap](IMAGES/correlation_heatmap.png)
+| Model | Train ROC-AUC | Test ROC-AUC | Train F1 | Test F1 |
+|---|---:|---:|---:|---:|
+| Balanced Logistic Regression | 0.651 | 0.616 | 0.554 | 0.551 |
+| Random Forest | 1.000 | 0.621 | 1.000 | 0.412 |
+| Gradient Boosting | 0.966 | 0.593 | 0.822 | 0.347 |
 
-### Logistic Regression coefficients
+Unbalanced Logistic Regression achieved a five-fold training cross-validation ROC-AUC mean of 0.624 with a standard deviation of 0.035.
 
-![Logistic Regression coefficients](IMAGES/logistic_regression_coefficients.png)
+The tree-based models demonstrated substantial train-test performance gaps, indicating potential overfitting.
 
-In my fitted Logistic Regression model, the largest positive coefficients include `drugs`, `symptom`, and `preanti`; larger negative coefficients include `strat_3`, `str2`, `cd40`, and `karnof`. Continuous predictors were standardized before model fitting, so coefficients for those fields correspond to a one-standard-deviation change, not a one-unit change in their original measurement scale. Coefficients are conditional model associations, not causal effects. High VIF values also mean coefficient interpretation should be cautious.
+## 10. Important Validation Considerations
 
-## 7. Important validation caveat and recommended next steps
+The threshold-tuned test metrics should not be considered an unbiased estimate of final model performance.
 
-**The threshold-tuned test metrics are not an independent final test estimate.** In the notebook, `precision_recall_curve(y_test, log_reg_probs)` is used to choose the threshold that maximizes F1, and the same `y_test` is then used to report the threshold-0.448 performance. This lets the test labels influence the decision threshold and can make the reported F1/recall optimistic.
+The notebook selected the threshold using `y_test` and then evaluated the model on the same test labels.
 
-Before presenting the tuned result as final model performance:
-1. Split the original training data into training and validation subsets, or use out-of-fold predictions.
-2. Select the threshold using only validation data / out-of-fold predictions.
-3. Keep the test set untouched until all choices are fixed.
-4. Put preprocessing and modelling in a single scikit-learn `Pipeline` so scaling is refitted within each cross-validation fold.
-5. Recompute the final metrics, confusion matrix, and plots on the untouched test set.
+### Recommended Improvements
 
-Additional considerations:
-- The reported VIF values are high for several predictors (age 16.86, weight 32.39, Karnofsky score 45.40, CD4 10.28, CD8 5.52). Investigate collinearity and consider regularization/sensitivity analysis.
-- The scaler is fitted on the full training partition before cross-validation in the current notebook; fold-specific preprocessing would be more rigorous.
-- I performed multiple univariate tests without a multiple-comparison correction.
-- My notebook's prediction helper manually recreates feature engineering and dummy encoding. A single fitted preprocessing/model pipeline would reduce training-serving mismatch risk.
-- The supplied files do not establish dataset provenance, redistribution permission, or the full feature codebook. Verify these before publishing the CSV publicly.
-- This is a small, historical dataset and the recorded discrimination is modest. External validation and calibration assessment would be needed before any real-world use.
+1. Split the training data into training and validation subsets.
+2. Select the optimal threshold using validation data or out-of-fold predictions.
+3. Keep the test set untouched until all modelling decisions are finalised.
+4. Use a scikit-learn Pipeline to prevent preprocessing leakage during cross-validation.
+5. Recalculate the final evaluation metrics on the untouched test set.
 
-## 8. Repository structure
+### Additional Limitations
+
+- Several predictors show high VIF values, indicating multicollinearity.
+- Multiple univariate tests were performed without correction.
+- The current prediction helper manually recreates preprocessing.
+- The dataset is relatively small and historical.
+- Independent external validation has not been performed.
+- Dataset provenance and redistribution permissions need confirmation.
+
+## 11. Technologies and Libraries
+
+| Category | Technologies |
+|---|---|
+| Programming Language | Python |
+| Development Environment | Jupyter Notebook |
+| Data Manipulation | Pandas, NumPy |
+| Data Visualization | Matplotlib, Seaborn |
+| Statistical Analysis | SciPy, Statsmodels |
+| Machine Learning | Scikit-learn |
+| Model Persistence | Joblib |
+
+## 12. Repository Structure
 
 ```text
 clinical-trial-dropout-prediction/
+│
 ├── README.md
 ├── LICENSE
 ├── requirements.txt
 ├── .gitignore
+│
 ├── data/
 │   └── raw/
 │       └── ACTG175_clinical_trial.csv
+│
 ├── notebooks/
 │   └── clinical_trial_dropout_analysis.ipynb
-└── results/
-    ├── graphs/
-    │   ├── target_distribution.png
-    │   ├── missing_values.png
-    │   ├── correlation_heatmap.png
-    │   ├── feature_boxplots_by_target.png
-    │   ├── model_performance_comparison.png
-    │   ├── confusion_matrix_logistic_0448.png
-    │   └── logistic_regression_coefficients.png
-    └── metrics/
-        └── model_comparison_as_notebook_reported.csv
+│
+└── IMAGES/
+    ├── target_distribution.png
+    ├── missing_values.png
+    ├── correlation_heatmap.png
+    ├── feature_boxplots_by_target.png
+    ├── model_performance_comparison.png
+    ├── confusion_matrix_logistic_0448.png
+    └── logistic_regression_coefficients.png
 ```
 
-Model `.pkl` files are not included because the uploaded notebook is the supplied reproducible analysis artifact; its final cell creates model artifacts when executed. Do not commit generated model files unless you intend to distribute them and have reviewed their contents.
+## 13. Installation and Execution
 
-## 9. Technologies
-
-- Python
-- Jupyter Notebook
-- pandas and NumPy
-- Matplotlib and Seaborn
-- SciPy
-- scikit-learn
-- statsmodels
-- joblib
-
-## 10. Installation and execution
-
-I prepared this repository from my existing notebook and CSV. I have not yet performed a clean-room execution in a newly created environment, so reproducibility should be confirmed by following the steps below.
+### Step 1: Clone the Repository
 
 ```bash
 git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd clinical-trial-dropout-prediction
+```
 
+### Step 2: Create a Virtual Environment
+
+```bash
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
+```
 
+Activate the environment:
+
+**Windows**
+
+```bash
+.venv\Scripts\activate
+```
+
+**macOS/Linux**
+
+```bash
+source .venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+### Step 4: Launch Jupyter Notebook
+
+```bash
 jupyter notebook
 ```
 
-Open `notebooks/clinical_trial_dropout_analysis.ipynb` and run the cells from top to bottom. My notebook's data-loading cell supports execution with the working directory at either the repository root or the `notebooks/` directory.
+Open:
 
-## 11. What I learned
+`notebooks/clinical_trial_dropout_analysis.ipynb`
 
-Through this project, I practised taking a clinical-trial dataset through a complete classical machine-learning workflow: exploring and preparing the data, testing statistical associations, engineering a feature, comparing classification models, evaluating class-sensitive metrics, and interpreting model coefficients. The validation caveats described above are also important lessons from this work, and I plan to address them before treating the tuned results as final.
+Run the notebook cells sequentially.
 
-## 12. Limitations
+## 14. Key Learnings
 
-- Moderate classification performance on the recorded split.
-- Threshold selection currently reuses the test labels.
-- Several predictors show high VIF values.
-- No independent external validation cohort is supplied.
-- Dataset provenance, redistribution terms, and complete field definitions need confirmation.
-- The model estimates an association with the recorded endpoint; it does not explain why a participant discontinued treatment.
+Through this project, I gained practical experience in:
 
-## 13. Future improvements
+- Exploratory Data Analysis of clinical-trial data.
+- Statistical hypothesis testing.
+- Feature engineering using clinical variables.
+- Data preprocessing and categorical encoding.
+- Handling class imbalance using class weighting.
+- Comparing classical machine learning algorithms.
+- Evaluating classification models using multiple metrics.
+- Decision-threshold optimisation.
+- Interpreting Logistic Regression coefficients.
+- Identifying overfitting and validation limitations.
 
-- Re-evaluate using a leakage-safe Pipeline and untouched test set.
-- Tune the classification threshold on validation/out-of-fold predictions.
-- Assess calibration (calibration curve, Brier score) and decision-analytic utility.
-- Investigate multicollinearity and regularized Logistic Regression.
-- Add subgroup performance and fairness checks where permitted and scientifically justified.
-- Validate on an independent, appropriately documented cohort.
-- Package a reusable prediction pipeline with schema validation.
+## 15. Future Improvements
 
-## 14. Dataset attribution and licence
+- Implement leakage-safe preprocessing pipelines.
+- Perform threshold optimisation using cross-validation.
+- Investigate regularised Logistic Regression.
+- Address multicollinearity.
+- Evaluate probability calibration using Brier score and calibration curves.
+- Conduct subgroup performance and fairness analysis where appropriate.
+- Validate the model using an independent dataset.
+- Develop a reusable prediction pipeline with schema validation.
 
-The uploaded notebook labels the study as ACTG 175, but the supplied files do not include the original dataset URL, source citation, or redistribution licence. **Confirm the source and permission to redistribute the CSV before making this repository public.** If redistribution is not permitted, remove the CSV from the public repository and document how eligible users can obtain it from the authorised source.
+## 16. Dataset Attribution and Licence
 
-The included `LICENSE` is intended to cover original project code only, not third-party dataset contents. Replace the author placeholder and confirm that you have the right to license the code before publishing.
+The supplied notebook identifies the study as ACTG 175. However, the original dataset URL, source citation, and redistribution licence were not included in the supplied files.
 
-## 15. Author
+The original dataset source and permission to redistribute the CSV should be verified before making the repository public.
 
-**Satyam Chandel**  
+The included `LICENSE` is intended to cover original project code only, not third-party dataset contents.
+
+## 17. Author
+
+**Satyam Chandel**
+
 MSc Statistics | Machine Learning | Healthcare Analytics
 
-I developed this project as part of my work in machine learning and healthcare analytics.
-
+This project was developed as part of my work in machine learning and healthcare analytics.
 
 ---
 
-*Prepared from the supplied notebook and CSV. Reported model results are transcribed from notebook outputs and should be re-evaluated using the validation procedure described above before being represented as final generalization performance.*
-
+*Note: Reported model metrics are transcribed from the executed notebook outputs. The threshold-tuned results require independent validation before being treated as final estimates of generalisation performance.*
