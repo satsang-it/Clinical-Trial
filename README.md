@@ -61,7 +61,7 @@ In my analysis, I treated `trt` and `strat` as multi-level categorical variables
 
 The uploaded CSV has no missing values and no exact duplicate rows.
 
-![Missing values](results/graphs/missing_values.png)
+![Missing values](IMAGES/missing_values.png)
 
 ## 4. Workflow and methodology
 
