@@ -385,12 +385,6 @@ The original dataset source and permission to redistribute the CSV should be ver
 
 The included `LICENSE` is intended to cover original project code only, not third-party dataset contents.
 
-## 17. Author
-
-**Satyam Chandel**
-
-MSc Statistics | Machine Learning | Healthcare Analytics
-
 This project was developed as part of my work in machine learning and healthcare analytics.
 
 ---
