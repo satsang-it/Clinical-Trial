@@ -104,7 +104,7 @@ The following values are taken from the executed outputs of my notebook. They ar
 | Gradient Boosting / 0.500 | 0.621 | 0.462 | 0.277 | 0.347 | 0.593 |
 | Logistic Regression / 0.448 | 0.558 | 0.436 | 0.748 | 0.551 | 0.616 |
 
-![Model performance comparison](results/graphs/model_performance_comparison.png)
+![Model performance comparison](IMAGES/model_performance_comparison.png)
 
 ### Selected model in the notebook
 
