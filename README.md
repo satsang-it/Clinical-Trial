@@ -55,7 +55,7 @@ In my analysis, I treated `trt` and `strat` as multi-level categorical variables
 
 ### Target distribution
 
-![Target distribution](results/graphs/target_distribution.png)
+![Target distribution](IMAGES/target_distribution.png)
 
 ### Data quality
 
