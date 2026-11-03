@@ -142,7 +142,7 @@ The tree models show large train-test gaps in the notebook, consistent with subs
 
 ### Logistic Regression coefficients
 
-![Logistic Regression coefficients](results/graphs/logistic_regression_coefficients.png)
+![Logistic Regression coefficients](IMAGES/logistic_regression_coefficients.png)
 
 In my fitted Logistic Regression model, the largest positive coefficients include `drugs`, `symptom`, and `preanti`; larger negative coefficients include `strat_3`, `str2`, `cd40`, and `karnof`. Continuous predictors were standardized before model fitting, so coefficients for those fields correspond to a one-standard-deviation change, not a one-unit change in their original measurement scale. Coefficients are conditional model associations, not causal effects. High VIF values also mean coefficient interpretation should be cautious.
 
