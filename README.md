@@ -134,7 +134,7 @@ The tree models show large train-test gaps in the notebook, consistent with subs
 
 ### Numeric features by target
 
-![Numeric feature boxplots](results/graphs/feature_boxplots_by_target.png)
+![Numeric feature boxplots](IMAGES/correlation_heatmap.png)
 
 ### Correlation
 
