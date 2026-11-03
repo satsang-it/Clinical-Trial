@@ -138,7 +138,7 @@ The tree models show large train-test gaps in the notebook, consistent with subs
 
 ### Correlation
 
-![Correlation heatmap](results/graphs/correlation_heatmap.png)
+![Correlation heatmap](IMAGES/correlation_heatmap.png)
 
 ### Logistic Regression coefficients
 
