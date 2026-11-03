@@ -1,5 +1,5 @@
 
-# Clinical Trial Patient Dropout Prediction
+# Clinical Trial Patient Treatment Discontinuation Prediction
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Domain](https://img.shields.io/badge/Domain-Healthcare%20Analytics-teal)
@@ -52,6 +52,8 @@ The project summary in my notebook describes the outcome as discontinuation of a
 
 ## 3. Dataset Description
 
+The project uses the ACTG 175 clinical-trial dataset.
+
 | Attribute | Value |
 |---|---:|
 | Total Observations | 2,139 |
@@ -62,7 +64,47 @@ The project summary in my notebook describes the outcome as discontinuation of a
 | Class 0 | 1,363 (63.7%) |
 | Class 1 | 776 (36.3%) |
 
-**Dataset File:** `data/raw/ACTG175_clinical_trial.csv`
+**Dataset File:** `ACTG175_clinical_trial.csv`
+
+### Dataset Feature Dictionary
+
+The dataset contains 24 variables covering demographic characteristics, medical history, treatment information, clinical measurements, and treatment-discontinuation outcomes.
+
+| Feature | Description | Data Type | Values / Interpretation |
+|---|---|---|---|
+| `time` | Time to failure or censoring | Numerical | Follow-up time in days |
+| `trt` | Assigned treatment group | Categorical | 0 = ZDV only; 1 = ZDV + ddI; 2 = ZDV + Zal; 3 = ddI only |
+| `age` | Participant's age at baseline | Numerical | Years |
+| `wtkg` | Participant's weight at baseline | Numerical | Kilograms |
+| `hemo` | Hemophilia indicator | Binary | 0 = No; 1 = Yes |
+| `homo` | Historical homosexual activity indicator | Binary | 0 = No; 1 = Yes |
+| `drugs` | History of intravenous drug use | Binary | 0 = No; 1 = Yes |
+| `karnof` | Karnofsky performance status score | Numerical | Scale of 0–100 |
+| `oprior` | Previous non-zidovudine antiretroviral therapy | Binary | 0 = No; 1 = Yes |
+| `z30` | Zidovudine use during the 30 days before treatment initiation | Binary | 0 = No; 1 = Yes |
+| `zprior` | Previous zidovudine use | Binary | 0 = No; 1 = Yes |
+| `preanti` | Number of days of previously received antiretroviral therapy | Numerical | Days |
+| `race` | Participant's recorded race category | Binary | 0 = White; 1 = Non-white |
+| `gender` | Participant's recorded gender category | Binary | 0 = Female; 1 = Male |
+| `str2` | Antiretroviral treatment history | Binary | 0 = Treatment-naive; 1 = Treatment-experienced |
+| `strat` | Antiretroviral history stratification | Categorical | 1 = Naive; 2 = More than 1 and up to 52 weeks; 3 = More than 52 weeks |
+| `symptom` | Symptomatic status indicator | Binary | 0 = Asymptomatic; 1 = Symptomatic |
+| `treat` | Broad treatment indicator | Binary | 0 = Zidovudine only; 1 = Other therapies |
+| `offtrt` | Indicator of being off treatment before approximately 96 ± 5 weeks | Binary | 0 = No; 1 = Yes |
+| `cd40` | Baseline CD4 T-cell count | Numerical | Baseline clinical measurement |
+| `cd420` | CD4 T-cell count at approximately 20 ± 5 weeks | Numerical | Follow-up clinical measurement |
+| `cd80` | Baseline CD8 T-cell count | Numerical | Baseline clinical measurement |
+| `cd820` | CD8 T-cell count at approximately 20 ± 5 weeks | Numerical | Follow-up clinical measurement |
+| `label` | Event/censoring indicator in the supplied dataset | Binary | Refer to the original dataset documentation to confirm the exact 0/1 coding |
+
+**Abbreviations:**
+- ZDV: Zidovudine
+- ddI: Didanosine
+- Zal: Zalcitabine
+- CD4: Cluster of Differentiation 4 T cells
+- CD8: Cluster of Differentiation 8 T cells
+
+**Important:** The feature definitions follow the documented ACTG 175 dataset terminology. The `time` and `label` fields should be checked against the exact version of the supplied CSV before interpreting their coding. The dataset's `label` variable is not the prediction target in this project.
 
 ### Target Distribution
 
@@ -77,10 +119,6 @@ The supplied dataset contains no missing values and no exact duplicate rows.
 <p align="center">
   <img src="IMAGES/missing_values.png" width="400" alt="Missing Values Analysis">
 </p>
-
-### Dataset Features
-
-`time`, `trt`, `age`, `wtkg`, `hemo`, `homo`, `drugs`, `karnof`, `oprior`, `z30`, `zprior`, `preanti`, `race`, `gender`, `str2`, `strat`, `symptom`, `treat`, `offtrt`, `cd40`, `cd420`, `cd80`, `cd820`, `label`.
 
 ## 4. Exploratory Data Analysis
 
@@ -302,7 +340,7 @@ Clinical-Trial-Patient-Treatment-Discontinuation-Prediction/
 
 ```bash
 git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd clinical-trial-dropout-prediction
+cd Clinical-Trial-Patient-Treatment-Discontinuation-Prediction
 ```
 
 ### Step 2: Create a Virtual Environment
@@ -328,7 +366,7 @@ source .venv/bin/activate
 ### Step 3: Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install pandas numpy matplotlib seaborn scipy scikit-learn statsmodels joblib jupyter
 ```
 
 ### Step 4: Launch Jupyter Notebook
@@ -337,11 +375,9 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-Open:
+Open `Clinical_Trail.ipynb` and execute the cells sequentially.
 
-`notebooks/clinical_trial_dropout_analysis.ipynb`
-
-Run the notebook cells sequentially.
+The dataset is available in the repository root as `ACTG175_clinical_trial.csv`.
 
 ## 14. Key Learnings
 
@@ -371,14 +407,25 @@ Through this project, I gained practical experience in:
 
 ## 16. Dataset Attribution and Licence
 
-The supplied notebook identifies the study as ACTG 175. However, the original dataset URL, source citation, and redistribution licence were not included in the supplied files.
+The supplied notebook identifies the study as ACTG 175. The original dataset URL, source citation, and redistribution licence were not included in the supplied files.
 
 The original dataset source and permission to redistribute the CSV should be verified before making the repository public.
 
-The included `LICENSE` is intended to cover original project code only, not third-party dataset contents.
+The included project documentation is intended to describe original project code and analysis, not to grant rights over third-party dataset contents.
+
+## 17. Author
+
+**Satyam Chandel**
+
+MSc Statistics | Machine Learning | Healthcare Analytics
 
 This project was developed as part of my work in machine learning and healthcare analytics.
 
 ---
 
 *Note: Reported model metrics are transcribed from the executed notebook outputs. The threshold-tuned results require independent validation before being treated as final estimates of generalisation performance.*
+
+### Dataset References
+
+- [ACTG 175 Dataset Documentation – CRAN BART](https://github.com/cran/BART/blob/master/man/ACTG175.Rd)
+- [AIDS Clinical Trials Group Study 175 – UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/890/aids+clinical+trials+group+study+175)
