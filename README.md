@@ -112,7 +112,7 @@ I selected **class-weighted Logistic Regression** with a decision threshold of *
 
 Its recorded confusion matrix is:
 
-![Confusion matrix](results/graphs/confusion_matrix_logistic_0448.png)
+![Confusion matrix](confusion_matrix_logistic_0448.png)
 
 | | Predicted 0 | Predicted 1 |
 |---|---:|---:|
